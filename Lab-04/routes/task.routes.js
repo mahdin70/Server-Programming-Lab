@@ -4,14 +4,12 @@ const {
   getTasks,
   createTask,
   deleteTask,
-  getProfilesTask,
   updateTask,
 } = require("../controllers/task.controllers");
 
-router.get('/tasks', getTasks)
+router.get('/tasks', getTasks);
 router.post('/createtask', createTask);
 router.delete('/deletetask/:name', deleteTask);
-router.get('/getProfilestask', getProfilesTask);
-router.patch("/updatetask/:name/:description", updateTask);
+router.patch("/updatetask/:name", updateTask);
 
 module.exports = router;
