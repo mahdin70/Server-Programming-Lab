@@ -10,6 +10,14 @@ const TaskSchema = new mongoose.Schema({
   user_id: {
     type: String,
   },
+  images: {
+    type: [String],
+    default: [],
+  },
+  audio: {
+    type: String,
+    default: "",
+  },
 });
 
 const Task = mongoose.model("Task", TaskSchema);

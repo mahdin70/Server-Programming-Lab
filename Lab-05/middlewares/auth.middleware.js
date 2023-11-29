@@ -5,8 +5,4 @@ const ensureAuthenticated = (req, res, next) => {
         res.status(200).json({error: "You do not have access"})
       }
     };
-    
-    
-module.exports = ensureAuthenticated;
-
-  
+    module.exports = ensureAuthenticated;

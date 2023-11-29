@@ -27,11 +27,13 @@ router.get("/profiles", getProfileInfos);
 router.patch("/update-profile", updateProfile);
 router.delete("/delete-profile/:id", deleteProfile);
 
+// upload images
 const {
   uploadProfileImage,
   uploadAudioFile,
 } = require("../middlewares/image.middleware");
 const {
+  getMediaPage,
   postProfileImage,
   postMultipleImages,
   getMultipleImages,
@@ -53,6 +55,5 @@ router.post(
 
 router.get("/multiple_image", getMultipleImages);
 router.post("/upload/audio", uploadAudioFile.single("audio"), postAudioFile);
-
 
 module.exports = router;

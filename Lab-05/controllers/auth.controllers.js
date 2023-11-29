@@ -3,6 +3,7 @@ const path = require("path");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 
+
 const getLogin = async (req, res) => {
   const filePath = path.join(__dirname, "..", "views", "login.html");
   res.sendFile(filePath);
@@ -10,7 +11,7 @@ const getLogin = async (req, res) => {
 
 const postLogin = (req, res, next) => {
   passport.authenticate("local", {
-    successRedirect: "/welcome",
+    successRedirect: "/media-pages",
     failureRedirect: "/login",
     failureFlash: true,
   })(req, res, next);
@@ -219,6 +220,7 @@ const postAudioFile = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 module.exports = {
   getLogin,
   getRegister,

@@ -1,9 +1,12 @@
 const Task = require("../dataModels/Task.model");
+const {
+  uploadProfileImage,
+  uploadAudioFile,
+} = require("../middlewares/image.middleware");
 
 const getTasks = async (req, res) => {
   try {
-    const userId = req.user._id;
-    const tasks = await Task.find({ user_id: userId });
+    const tasks = await Task.find({ user_id: req.user._id });
     res.status(200).json(tasks);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -12,7 +15,7 @@ const getTasks = async (req, res) => {
 
 const createTask = async (req, res) => {
   const { name, description } = req.body;
-  const userId = req.user._id; // Assuming you get the user ID from authentication
+  const userId = req.user._id;
 
   const newTask = new Task({
     name,
@@ -21,25 +24,34 @@ const createTask = async (req, res) => {
   });
 
   try {
-    await newTask.save();
-    res.status(200).json({ message: "Task created" });
+    uploadProfileImage.array("images", 5)(req, res, async (err) => {
+      if (err) {
+        return res.status(400).json({ error: "Image upload failed" });
+      }
+
+      uploadAudioFile.single("audio")(req, res, async (audioErr) => {
+        if (audioErr) {
+          return res.status(400).json({ error: "Audio upload failed" });
+        }
+
+        try {
+          if (req.files && req.files.length > 0) {
+            newTask.images = req.files.map((file) => file.filename);
+          }
+
+          if (req.file) {
+            newTask.audio = req.file.filename;
+          }
+
+          await newTask.save();
+          res.status(200).json({ message: "Task created" });
+        } catch (saveError) {
+          res.status(400).json({ error: "Failed to create the task" });
+        }
+      });
+    });
   } catch (error) {
     res.status(400).json({ error: "Please try again" });
-  }
-};
-
-const deleteTask = async (req, res) => {
-  try {
-    const TaskName = req.params.name;
-    const deletedTask = await Task.findOneAndDelete({ name: TaskName });
-
-    if (deletedTask) {
-      res.status(200).json({ message: "Task deleted" });
-    } else {
-      res.status(400).json({ error: "Task does not exist" });
-    }
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 };
 
@@ -47,10 +59,24 @@ const updateTask = async (req, res) => {
   try {
     const name = req.params.name;
     const description = req.body.description;
+    const images = req.files ? req.files.map((file) => file.filename) : [];
+    const audio = req.file ? req.file.filename : "";
+
     const task = await Task.findOne({ name });
-    
+
     if (task) {
-      task.description = description;
+      if (description) {
+        task.description = description;
+      }
+
+      if (images.length > 0) {
+        task.images = task.images.concat(images);
+      }
+
+      if (audio) {
+        task.audio = audio;
+      }
+
       await task.save();
       res.json({ message: "Task updated" });
     } else {
@@ -64,6 +90,5 @@ const updateTask = async (req, res) => {
 module.exports = {
   getTasks,
   createTask,
-  deleteTask,
   updateTask,
 };

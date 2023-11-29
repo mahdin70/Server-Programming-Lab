@@ -16,7 +16,15 @@ const UserSchema = new mongoose.Schema({
   },
   profile_image: {
     type: String,
-    default: "",
+    default:'',
+  },
+  images: {
+    type: [String],
+    default:[],
+  },
+  audio: {
+    type: String,
+    default:'',
   },
 });
 
